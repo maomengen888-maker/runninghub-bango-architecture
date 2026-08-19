@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RunningHub Bango Agent 六层平台架构</title>
+<style>
+:root{--ink:#17212b;--muted:#647180;--fact:#168055;--infer:#b87300;--suggest:#7650bf;--unknown:#687382;--blue:#edf3ff;--yellow:#fff4d3;--lav:#f1ebff;--base:#e7eefc;--green:#e5f7e9;--red:#ffe9e6;--line:#d7dde5;--lime:#c8ff00;--cyan:#20d7ef}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#f3f5f7;color:var(--ink);font:13px/1.35 Inter,"PingFang SC","Microsoft YaHei",sans-serif}body{padding:24px}.page{max-width:1440px;margin:auto;background:#fff;border:1px solid var(--line);box-shadow:0 18px 48px rgba(22,31,42,.08)}header{position:relative;overflow:hidden;background:#070b0c;color:#fff;padding:28px 34px 22px;border-bottom:4px solid var(--lime)}header:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:30px 30px}header>*{position:relative}header .kicker{color:var(--cyan);font-weight:800;letter-spacing:.08em}header h1{margin:5px 0 7px;font-size:clamp(27px,4vw,48px);line-height:1.05;letter-spacing:-.04em}header p{margin:0;color:#bcc7d0}.legend{display:flex;gap:16px;flex-wrap:wrap;padding:13px 24px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px}.legend span{display:inline-flex;align-items:center;gap:6px}.swatch{width:26px;height:12px;background:#fff;border-radius:3px}.swatch.fact{border:2px solid var(--fact)}.swatch.infer{border:2px dashed var(--infer)}.swatch.suggest{border:2px dotted var(--suggest)}.swatch.unknown{border:2px dotted var(--unknown);background:#f1f3f5}.architecture{padding:20px;overflow:auto}.canvas{min-width:1180px}.layer{display:grid;grid-template-columns:108px 1fr;gap:12px;align-items:stretch}.layer-name{display:grid;place-items:center;font-size:22px;font-weight:850;letter-spacing:.08em}.band{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:10px;padding:12px;border-radius:10px}.user .band{background:var(--blue)}.app .band{background:var(--yellow)}.platform .band{background:var(--lav)}.base .band{background:var(--base)}.model .band{background:var(--green)}.data .band{background:var(--red)}.group{padding:9px;border:1px solid rgba(69,79,92,.16);border-radius:8px;background:rgba(255,255,255,.45)}.group h2{margin:0 0 8px;text-align:center;font-size:14px;color:#3e4a57}.span3{grid-column:span 3}.span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}.nodes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.nodes.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}.node{position:relative;display:grid;place-items:center;min-height:41px;padding:6px 7px;text-align:center;background:#fff;border-radius:6px;overflow-wrap:anywhere}.node.fact{border:2px solid var(--fact)}.node.infer{border:2px dashed var(--infer)}.node.suggest{border:2px dotted var(--suggest)}.node.unknown{border:2px dotted var(--unknown);background:#f1f3f5;color:#65717e}.ev{display:block;margin-top:2px;color:#7b8792;font-size:9px;line-height:1}.arrow{display:grid;grid-template-columns:108px 1fr;gap:12px;height:34px}.arrow>div{justify-self:center;position:relative;width:2px;height:34px;background:#202b35}.arrow>div:before,.arrow>div:after{content:"";position:absolute;left:50%;width:8px;height:8px;border-left:2px solid #202b35;border-top:2px solid #202b35}.arrow>div:before{top:1px;transform:translateX(-50%) rotate(45deg)}.arrow>div:after{bottom:1px;transform:translateX(-50%) rotate(225deg)}.arrow span{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:max-content;background:#fff;padding:2px 6px;color:var(--muted);font-size:11px}.note{padding:0 24px 18px;color:var(--muted);font-size:11px;text-align:right}
+@media(max-width:780px){body{padding:0}.page{border:0}.architecture{padding:10px}header{padding:24px 18px}.legend{padding-left:16px}.canvas{min-width:1060px}}
+@media print{@page{size:A3 landscape;margin:8mm}body{padding:0;background:#fff}.page{max-width:none;border:0;box-shadow:none}.architecture{overflow:visible}.canvas{min-width:0}.node{font-size:10px}.group h2{font-size:12px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div class="kicker">RUNNINGHUB · BANGO AGENT</div>
+    <h1>故事动画创作平台六层架构</h1>
+    <p>证据范围 S01–S10 · 从自然语言需求到角色设计信息完成</p>
+  </header>
+
+  <div class="legend" aria-label="证据等级图例">
+    <span><i class="swatch fact"></i>页面事实</span>
+    <span><i class="swatch infer"></i>合理推断</span>
+    <span><i class="swatch suggest"></i>建议设计</span>
+    <span><i class="swatch unknown"></i>尚未确认</span>
+  </div>
+
+  <div class="architecture" role="img" aria-label="RunningHub Bango Agent 用户层、应用层、平台层、基座层、模型层和数据层架构图">
+    <div class="canvas">
+      <section class="layer user">
+        <div class="layer-name">用户层</div>
+        <div class="band">
+          <div class="group span8"><h2>Bango Agent 创作工作台</h2><div class="nodes cols3">
+            <div class="node fact">自然语言输入<span class="ev">S01</span></div>
+            <div class="node fact">剧本 / 风格附件入口<span class="ev">S01</span></div>
+            <div class="node fact">参数选择卡<span class="ev">S02</span></div>
+            <div class="node fact">主题 / 风格选择<span class="ev">S03 / S08–S09</span></div>
+            <div class="node fact">专业 Agent 群聊<span class="ev">S04–S10</span></div>
+            <div class="node fact">执行状态 / 停止 / 继续<span class="ev">S05–S07</span></div>
+          </div></div>
+          <div class="group span4"><h2>节点画布与结果管理</h2><div class="nodes">
+            <div class="node fact">剧本 / 角色节点<span class="ev">S10</span></div>
+            <div class="node fact">单节点生成<span class="ev">S10</span></div>
+            <div class="node fact">运行全部节点<span class="ev">S10</span></div>
+            <div class="node unknown">预览 / 剪辑 / 导出</div>
+          </div></div>
+        </div>
+      </section>
+
+      <div class="arrow"><i></i><div><span>用户指令 ↓　页面反馈 ↑</span></div></div>
+
+      <section class="layer app">
+        <div class="layer-name">应用层</div>
+        <div class="band">
+          <div class="group span7"><h2>专业 Agent</h2><div class="nodes cols3">
+            <div class="node fact">艺术总监<span class="ev">S04–S05</span></div>
+            <div class="node fact">编剧<span class="ev">S06–S10</span></div>
+            <div class="node fact">角色设计师<span class="ev">S10</span></div>
+            <div class="node unknown">场景设计师<span class="ev">仅见下游入口 S10</span></div>
+            <div class="node unknown">分镜师</div>
+            <div class="node unknown">视频 / 音频 Agent</div>
+          </div></div>
+          <div class="group span5"><h2>创作应用</h2><div class="nodes">
+            <div class="node fact">项目参数管理<span class="ev">S02</span></div>
+            <div class="node fact">故事主题策划<span class="ev">S03–S04</span></div>
+            <div class="node fact">剧本生成<span class="ev">S05–S07</span></div>
+            <div class="node fact">171 种风格库<span class="ev">S08–S09</span></div>
+            <div class="node fact">角色设计信息<span class="ev">S10</span></div>
+            <div class="node unknown">场景 / 分镜 / 成片</div>
+          </div></div>
+        </div>
+      </section>
+
+      <div class="arrow"><i></i><div><span>阶段编排 ↓　确认 / 状态回传 ↑</span></div></div>
+
+      <section class="layer platform">
+        <div class="layer-name">平台层</div>
+        <div class="band">
+          <div class="group span4"><h2>Agent 与工作流编排</h2><div class="nodes">
+            <div class="node infer">Bango 主控 / 路由</div>
+            <div class="node fact">群聊邀请 / 交接<span class="ev">S05 / S10</span></div>
+            <div class="node fact">阶段确认门<span class="ev">S03–S04 / S10</span></div>
+            <div class="node infer">节点依赖调度<span class="ev">画布连线 S10</span></div>
+            <div class="node suggest">统一工作流状态</div>
+            <div class="node suggest">上游修改失效传播</div>
+          </div></div>
+          <div class="group span5"><h2>创作工具服务</h2><div class="nodes cols3">
+            <div class="node fact">script-node<span class="ev">S05</span></div>
+            <div class="node infer">主题推荐</div>
+            <div class="node infer">剧本结构化</div>
+            <div class="node infer">角色信息提取</div>
+            <div class="node fact">生成立绘入口<span class="ev">S10</span></div>
+            <div class="node fact">运行全部节点<span class="ev">S10</span></div>
+            <div class="node infer">全局风格注入<span class="ev">S08–S10</span></div>
+            <div class="node unknown">场景 / 分镜生成</div>
+            <div class="node unknown">视频 / 音频合成</div>
+          </div></div>
+          <div class="group span3"><h2>项目全局上下文</h2><div class="nodes">
+            <div class="node infer">ProjectConfig</div>
+            <div class="node infer">StoryContext</div>
+            <div class="node infer">ScriptContext</div>
+            <div class="node infer">StyleContext</div>
+            <div class="node infer">CharacterContext</div>
+            <div class="node suggest">Confirm / Evaluation</div>
+          </div></div>
+        </div>
+      </section>
+
+      <div class="arrow"><i></i><div><span>节点调用 ↓　任务 / 资产结果 ↑</span></div></div>
+
+      <section class="layer base">
+        <div class="layer-name">基座层</div>
+        <div class="band">
+          <div class="group span4"><h2>节点运行基座</h2><div class="nodes">
+            <div class="node infer">工作流图运行时</div>
+            <div class="node infer">任务队列 / Worker</div>
+            <div class="node suggest">幂等 / 重试 / 取消</div>
+            <div class="node suggest">状态一致性投影</div>
+          </div></div>
+          <div class="group span4"><h2>模型与资产基座</h2><div class="nodes">
+            <div class="node infer">模型网关</div>
+            <div class="node suggest">能力 / 价格注册表</div>
+            <div class="node infer">结构化业务存储</div>
+            <div class="node infer">对象存储 / CDN</div>
+          </div></div>
+          <div class="group span4"><h2>治理与运维</h2><div class="nodes">
+            <div class="node unknown">积分 / 计费</div>
+            <div class="node suggest">内容安全 / 版权</div>
+            <div class="node suggest">全链路 Trace</div>
+            <div class="node suggest">权限 / 私有资产隔离</div>
+          </div></div>
+        </div>
+      </section>
+
+      <div class="arrow"><i></i><div><span>标准化请求 ↓　模型结果 ↑</span></div></div>
+
+      <section class="layer model">
+        <div class="layer-name">模型层</div>
+        <div class="band">
+          <div class="group span4"><h2>文本与规划模型</h2><div class="nodes">
+            <div class="node unknown">艺术总监推理模型</div>
+            <div class="node unknown">剧本生成模型</div>
+          </div></div>
+          <div class="group span4"><h2>视觉生成模型</h2><div class="nodes">
+            <div class="node unknown">角色立绘模型</div>
+            <div class="node unknown">场景 / 分镜图模型</div>
+          </div></div>
+          <div class="group span4"><h2>视频与音频模型</h2><div class="nodes">
+            <div class="node unknown">视频生成模型</div>
+            <div class="node unknown">配音 / 音效 / BGM</div>
+          </div></div>
+        </div>
+      </section>
+
+      <div class="arrow"><i></i><div><span>读取输入 ↓　写回结果 ↑</span></div></div>
+
+      <section class="layer data">
+        <div class="layer-name">数据层</div>
+        <div class="band">
+          <div class="group span4"><h2>结构化项目数据</h2><div class="nodes">
+            <div class="node infer">用户 / 项目 / 会话</div>
+            <div class="node fact">时长 / 比例 / 语言<span class="ev">S02</span></div>
+            <div class="node fact">主题 / 标签 / 风格<span class="ev">S03–S09</span></div>
+            <div class="node infer">任务 / 状态 / 确认</div>
+          </div></div>
+          <div class="group span4"><h2>创作资产</h2><div class="nodes">
+            <div class="node fact">剧本文本<span class="ev">S06–S10</span></div>
+            <div class="node fact">角色描述<span class="ev">S06–S10</span></div>
+            <div class="node unknown">角色立绘 / 场景图</div>
+            <div class="node unknown">分镜 / 视频 / 音频</div>
+          </div></div>
+          <div class="group span4"><h2>知识与配置</h2><div class="nodes">
+            <div class="node fact">171 种风格库<span class="ev">S09</span></div>
+            <div class="node infer">主题推荐模板</div>
+            <div class="node fact">场景数量规则<span class="ev">S05</span></div>
+            <div class="node suggest">资产版本 / 依赖图</div>
+          </div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="note">角色“信息完成”不等于立绘资产完成；具体模型、计费、场景、分镜、视频与音频能力在 S01–S10 中尚未确认。</div>
+</main>
+</body>
+</html>
